@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Viet Restaurant Menu</title>
+    <style>
+        /* Toàn bộ nền trang */
+        body { 
+            margin: 0; 
+            background: #111; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            overflow: hidden; 
+            font-family: sans-serif; 
+        }
+        
+        #book-viewport { 
+            width: 100vw; 
+            height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background-color: #161f28; /* Màu nền bạn chọn */
+        }
+
+        /* Lớp phủ chọn ngôn ngữ lúc đầu */
+        #language-selector { 
+            position: absolute; 
+            z-index: 1000; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+        }
+        .lang-btn { 
+            padding: 18px 40px; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            border: none; 
+            border-radius: 50px; 
+            background: #e67e22; 
+            color: white; 
+            font-weight: bold; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+        }
+        
+        .hidden { display: none !important; }
+
+        /* Container sách - Tối ưu cho hiển thị 1 trang to */
+        #book-wrapper { 
+            width: 100%; 
+            height: 100%; 
+            max-width: 550px; /* Đảm bảo hình ảnh không bị quá bè trên PC */
+            position: relative;
+        }
+
+        .page { 
+            background-color: #161f28; 
+            width: 100%; 
+            height: 100%; 
+        }
+        .page img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; /* Ảnh to nhất có thể mà không bị mất hình */
+        }
+
+        /* NÚT SWITCH - Vị trí khung đỏ */
+        .switch-btn {
+            position: absolute;
+            bottom: 10%;      
+            left: 50%;  
+            transform: translateX(-50%);    
+            padding: 10px 16px;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.7); 
+            color: #f1c40f; 
+            border: 2px solid #f1c40f; 
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 100;
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* Hint nhắc khách vuốt */
+        .swipe-hint {
+            position: absolute;
+            bottom: 20px;
+            color: rgba(255,255,255,0.3);
+            font-size: 12px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="book-viewport">
+    <div id="language-selector">
+        <button class="lang-btn" onclick="initBook('en')">ENGLISH MENU</button>
+        <button class="lang-btn" onclick="initBook('de')">DEUTSCH MENU</button>
+    </div>
+    
+    <div id="book-wrapper">
+        <div id="book-canvas"></div>
+    </div>
+
+    <div id="hint" class="swipe-hint hidden">← Vuốt để lật trang →</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/page-flip/dist/js/page-flip.browser.min.js"></script>
+
+<script>
+    const assets = {
+        en: ["0.png", "1.1.png", "2.2.png", "3.3.png", "4.4.png", "5.5.png", "6.6.png", "7.7.png", "10.10.png"],
+        de: ["0.png", "1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "10.png"]
+    };
+
+    let pageFlip = null;
+
+    function initBook(lang) {
+        document.getElementById('language-selector').classList.add('hidden');
+        document.getElementById('hint').classList.remove('hidden');
+
+        // Xóa sạch canvas cũ
+        const canvasContainer = document.getElementById("book-wrapper");
+        canvasContainer.innerHTML = '<div id="book-canvas"></div>';
+        const canvas = document.getElementById("book-canvas");
+
+        const images = assets[lang];
+        images.forEach((src, index) => {
+            const pageDiv = document.createElement("div");
+            pageDiv.className = "page";
+            
+            const img = document.createElement("img");
+            img.src = src;
+            pageDiv.appendChild(img);
+
+            if (index === 0) {
+                const btn = document.createElement("button");
+                btn.className = "switch-btn";
+                btn.innerHTML = (lang === 'en') ? "WECHSELN ZU DEUTSCH" : "SWITCH TO ENGLISH";
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    initBook(lang === 'en' ? 'de' : 'en');
+                };
+                pageDiv.appendChild(btn);
+            }
+            canvas.appendChild(pageDiv);
+        });
+
+        // Khởi tạo thư viện với chế độ Single Page (Portrait)
+        setTimeout(() => {
+            pageFlip = new St.PageFlip(canvas, {
+                width: 600, 
+                height: 900,
+                size: "stretch", 
+                minWidth: 300,
+                maxWidth: 1000,
+                minHeight: 400,
+                maxHeight: 1500,
+                showCover: false, // Tắt chế độ cover để trang 1 không bị lệch
+                usePortrait: true, // LUÔN LUÔN HIỂN THỊ 1 TRANG
+                mobileScrollSupport: true,
+                flippingTime: 800,
+                startPage: 0,
+                clickEventForward: false
+            });
+
+            pageFlip.loadFromHTML(document.querySelectorAll(".page"));
+        }, 100); 
+    }
+</script>
+
+</body>
+</html>
