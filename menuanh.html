@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu Slide</title>
+
+<style>
+body {
+  margin: 0;
+  background: #161f28;
+  overflow: hidden;
+}
+
+/* khung slider */
+.slider {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  transition: transform 0.4s ease;
+}
+
+/* mỗi trang */
+.slide {
+  min-width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* hint */
+.hint {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  color: white;
+  opacity: 0.6;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="slider" id="slider"></div>
+<div class="hint">← Vuốt để chuyển trang →</div>
+
+<script>
+const images = [
+  "menuanh/1.png","menuanh/2.png","menuanh/3.png","menuanh/4.png","menuanh/5.png",
+  "menuanh/6.png","menuanh/7.png","menuanh/8.png","menuanh/9.png","menuanh/10.png"
+];
+
+const slider = document.getElementById("slider");
+
+let current = 0;
+
+// tạo slide
+images.forEach(src => {
+  const div = document.createElement("div");
+  div.className = "slide";
+
+  const img = document.createElement("img");
+  img.src = src;
+
+  div.appendChild(img);
+  slider.appendChild(div);
+});
+
+// cập nhật vị trí
+function updateSlide() {
+  slider.style.transform = `translateX(-${current * 100}vw)`;
+}
+
+// swipe
+let startX = 0;
+
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e => {
+  let endX = e.changedTouches[0].clientX;
+
+  // vuốt trái → next
+  if (startX - endX > 50 && current < images.length - 1) {
+    current++;
+    updateSlide();
+  }
+
+  // vuốt phải → prev
+  if (endX - startX > 50 && current > 0) {
+    current--;
+    updateSlide();
+  }
+});
+
+// click cũng chuyển
+document.addEventListener("click", () => {
+  if (current < images.length - 1) {
+    current++;
+    updateSlide();
+  }
+});
+</script>
+
+</body>
+</html>
