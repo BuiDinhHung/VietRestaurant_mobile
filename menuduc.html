@@ -51,8 +51,6 @@ body {
 <body>
 
 <div class="slider" id="slider"></div>
-<div class="hint">← Vuốt để chuyển trang →</div>
-
 <script>
 const images = [
   "menuduc/1.png","menuduc/2.png","menuduc/3.png","menuduc/4.png","menuduc/5.png",
@@ -104,10 +102,22 @@ document.addEventListener("touchend", e => {
 });
 
 // click cũng chuyển
-document.addEventListener("click", () => {
-  if (current < images.length - 1) {
-    current++;
-    updateSlide();
+document.addEventListener("click", (e) => {
+  const screenWidth = window.innerWidth;
+
+  // click bên phải → next
+  if (e.clientX > screenWidth / 2) {
+    if (current < images.length - 1) {
+      current++;
+      updateSlide();
+    }
+  } 
+  // click bên trái → prev
+  else {
+    if (current > 0) {
+      current--;
+      updateSlide();
+    }
   }
 });
 </script>
